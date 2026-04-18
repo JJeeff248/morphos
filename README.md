@@ -44,6 +44,8 @@ docker run --rm -p 8080:8080 -v /tmp:/tmp ghcr.io/danvergara/morphos-server:late
 
 ## Usage
 
+### HTML form
+
 Run the server as mentioned above and open up your favorite browser. You'll see something like this:
 
 <img src="screenshots/morphos.png"/>
@@ -68,18 +70,56 @@ A modal will pop up with a preview of the converted image.
 
 <img src="screenshots/modal_morphos.png"/>
 
+### API
+
+You can consume morphos through an API, so other systems can integrate with it.
+
+##### Endpoints
+
+`GET /api/v1/formats`
+
+This returns a JSON that shows the supported formats at the moment.
+
+e.g.
+
+```
+{"documents": ["docx", "xls"], "image": ["png", "jpeg"]}
+```
+
+`POST /api/v1/upload`
+
+This is the endpoint that converts files to a desired format. It is basically a multipart form data in a POST request. The API simply writes the converted files to the response body.
+
+e.g.
+
+```
+ curl -F 'targetFormat=epub' -F 'uploadFile=@/path/to/file/foo.pdf' localhost:8080/api/v1/upload --output foo.epub
+```
+The form fields are:
+
+* targetFormat: the target format the file will be converted to
+* uploadFile: The path to the file that is going to be converted
+
+### Configuration
+
+The configuration is only done by the environment varibles shown below.
+
+* `MORPHOS_PORT` changes the port the server will listen to (default is `8080`)
+* `MORPHOS_UPLOAD_PATH` defines the temporary path the files will be stored on disk (default is `/tmp`)
+
 ## Supported Files And Convert Matrix
 
 ### Images X Images
 
-|       |  PNG  |  JPEG  |  GIF  |  WEBP  |  TIFF  |  BMP  |
-|-------|-------|--------|-------|--------|--------|-------|
-|  PNG  |       |   ✅   |  ✅   |   ✅   |   ✅   |  ✅   |
-|  JPEG |  ✅   |        |  ✅   |   ✅   |   ✅   |  ✅   |
-|  GIF  |  ✅   |   ✅   |       |   ✅   |   ✅   |  ✅   |
-|  WEBP |  ✅   |   ✅   |  ✅   |        |   ✅   |  ✅   |
-|  TIFF |  ✅   |   ✅   |  ✅   |   ✅   |        |  ✅   |
-|  BMP  |  ✅   |   ✅   |  ✅   |   ✅   |   ✅   |       |
+|       |  PNG  |  JPEG  |  GIF  |  WEBP  |  TIFF  |  BMP  |  AVIF  |
+|-------|-------|--------|-------|--------|--------|-------|--------|  
+|  PNG  |       |   ✅   |  ✅   |   ✅   |   ✅   |  ✅   |   ✅   |
+|  JPEG |  ✅   |        |  ✅   |   ✅   |   ✅   |  ✅   |   ✅   |  
+|  GIF  |  ✅   |   ✅   |       |   ✅   |   ✅   |  ✅   |   ✅   | 
+|  WEBP |  ✅   |   ✅   |  ✅   |        |   ✅   |  ✅   |   ✅   |
+|  TIFF |  ✅   |   ✅   |  ✅   |   ✅   |        |  ✅   |   ✅   |
+|  BMP  |  ✅   |   ✅   |  ✅   |   ✅   |   ✅   |       |   ✅   |
+|  AVIF |  ✅   |   ✅   |  ✅   |   ✅   |   ✅   |  ✅   |        |
 
 ### Images X Documents
 
@@ -91,12 +131,13 @@ A modal will pop up with a preview of the converted image.
 |  WEBP |  ✅   |
 |  TIFF |  ✅   |
 |  BMP  |  ✅   |
+|  AVIF |       |
 
 ## Documents X Images
 
-|     | PNG | JPEG | GIF | WEBP | TIFF | BMP |
-| --- | --- | ---- | --- | ---- | ---- | --- |
-| PDF | ✅  | ✅   | ✅  | ✅   | ✅   | ✅  |
+|     | PNG | JPEG | GIF | WEBP | TIFF | BMP |  AVIF | 
+| --- | --- | ---- | --- | ---- | ---- | --- | ----  |
+| PDF | ✅  | ✅   | ✅  | ✅   | ✅   | ✅  |       |
 
 ## Documents X Documents
 
@@ -106,6 +147,30 @@ A modal will pop up with a preview of the converted image.
 | DOCX |      | ✅  |      |     |
 | CSV  |      |     |  ✅  |     |
 | XLSX |      |     |      | ✅  |
+
+## Ebooks X Ebooks
+
+|      | MOBI | EPUB |
+| ---- | ---- | --- |
+| EPUB | ✅   |     |
+| MOBI |      | ✅  |
+
+
+## Documents X Ebooks
+
+|      | EPUB | MOBI |
+| ---- | ---- | ---  |
+| PDF  | ✅   | ✅   |
+| DOCX |      |      |
+| CSV  |      |      |
+| XLSX |      |      |
+
+## Ebooks X Documents
+
+|      | PDF  |
+| ---- | ---- |
+| EPUB |  ✅  |
+| MOBI |  ✅  |
 
 ## License
 The MIT License (MIT). See [LICENSE](LICENSE) file for more details.

@@ -21,6 +21,7 @@ func NewGif() *Gif {
 	g := Gif{
 		compatibleFormats: map[string][]string{
 			"Image": {
+				AVIF,
 				JPG,
 				JPEG,
 				PNG,
@@ -34,6 +35,7 @@ func NewGif() *Gif {
 		},
 		compatibleMIMETypes: map[string][]string{
 			"Image": {
+				AVIF,
 				JPG,
 				JPEG,
 				PNG,
@@ -78,18 +80,12 @@ func (g *Gif) ConvertTo(fileType, subType string, file io.Reader) (io.Reader, er
 
 	switch strings.ToLower(fileType) {
 	case imageType:
-		img, err := gif.Decode(file)
+		convertedImage, err := convertToImage(subType, file)
 		if err != nil {
 			return nil, err
 		}
 
-		result, err = convertToImage(subType, img)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"ConvertTo: error at converting image to another format: %w",
-				err,
-			)
-		}
+		return convertedImage, nil
 	case documentType:
 		img, err := gif.Decode(file)
 		if err != nil {
